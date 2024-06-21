@@ -1,11 +1,10 @@
-import { cart, removeFromCart } from "../data/cart.js";
+import { cart, removeFromCart, updateDeliveryOption } from "../data/cart.js";
 import { products } from "../data/products.js";
 import { formatCurrency } from "./utils/money.js";
-import { hello } from 'https://unpkg.com/supersimpledev@1.0.1/hello.esm.js';
+
 import dayjs from 'https://unpkg.com/dayjs@1.11.10/esm/index.js';
 import { deliveryOptions } from '../data/deliveryOptions.js';
 
-console.log(hello());
 
 const today = dayjs();
 const deliveryDate = today.add(7, 'days');
@@ -61,8 +60,10 @@ function deliveryOptionsHTML(matchingProduct, cartItem) {
     const priceString = deliveryOption.priceCents === 0 ? 'FREE' : `$${formatCurrency(deliveryOption.priceCents)}`;
     const isChecked = deliveryOption.id === cartItem.deliveryOptionId;
 
-    html += `
-      <div class="delivery-option">
+    html+= `
+      <div class="delivery-option js-delivery-option"
+      data-product-id= "${matchingProduct.id}"
+      data-dlivery-option-id= "${deliveryOption.id}">
         <input type="radio" ${isChecked ? 'checked' : ''}
           class="delivery-option-input"
           name="delivery-option-${matchingProduct.id}">
@@ -85,5 +86,18 @@ document.querySelectorAll('.js-delete-link').forEach((link) => {
     removeFromCart(productId);
     const container = document.querySelector(`.js-cart-item-container-${productId}`);
     container.remove();
+  });
+});
+
+
+document.querySelectorAll('.js-delivery-option').forEach((element) => {
+  element.addEventListener('click', () => {
+
+
+    const {productId, deliveryOptionId}= element.dataset;
+
+    updateDeliveryOption(productId, deliveryOptionId);
+
+    
   });
 });
